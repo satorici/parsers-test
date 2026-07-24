@@ -1,0 +1,6 @@
+# Known-vulnerable pins so `trivy fs` reports CRITICAL/HIGH/MEDIUM/LOW CVEs.
+Django==1.11.29
+Flask==0.12.2
+urllib3==1.24.2
+PyYAML==3.12
+requests==2.19.1

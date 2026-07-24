@@ -1,0 +1,15 @@
+id: parsers-tests-info
+info:
+  name: Parsers test — info severity
+  author: satorici
+  severity: info
+  description: Always-matching template to exercise the nuclei INFO parser path.
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}"
+    matchers:
+      - type: status
+        status:
+          - 200

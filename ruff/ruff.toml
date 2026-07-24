@@ -1,0 +1,4 @@
+# Ruff config so we get rule-code prefixes that map to different parser severities:
+#   S*  → HIGH, F*/E* → MEDIUM, W* → LOW, I* → INFO
+[lint]
+select = ["S", "F", "E", "W", "I"]

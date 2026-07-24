@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.venv/
+venv/
+.env
+.env.*
+
+# Tool caches / reports
+.ruff_cache/
+.mypy_cache/
+.pytest_cache/
+.semgrep/
+**/.pyspector_cache/
+.basedpyright/
+.pyright/
+.trivy/
+.trivy-cache/
+.checkov/
+.nuclei-config/
+.nuclei-templates/
+*.sarif
+
+# Editors / OS
+.idea/
+.vscode/
+*.swp
+.DS_Store
+Thumbs.db

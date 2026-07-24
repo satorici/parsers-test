@@ -1,0 +1,89 @@
+settings:
+  name: "Parsers: frontend structured-output tests"
+  description: "Runs every security tool that has a dedicated frontend parser (plus shellcheck for the dynamic fallback) with JSON/JSONL output, so report stdout can be verified in the Satori web UI. Each tool scans its fixture folder with intentional findings across severities."
+  image: python
+  cpu: 2048
+  memory: 8192
+  timeout: 900
+  author:
+    - https://github.com/satorici
+  example: satori run ./ --report --output
+
+install:
+  system:
+    - export DEBIAN_FRONTEND=noninteractive; apt-get update -qq >/dev/null; apt-get install -qy --no-install-recommends curl unzip git ca-certificates shellcheck >/dev/null
+  pip:
+    - pip install -q --disable-pip-version-check --root-user-action=ignore semgrep bandit ruff basedpyright checkov pyspector
+  trivy:
+    - command -v trivy >/dev/null || curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
+  gitleaks:
+    - |
+      command -v gitleaks >/dev/null || (
+        VER=$(curl -sSL https://api.github.com/repos/gitleaks/gitleaks/releases/latest | grep tag_name | cut -d '"' -f4 | sed 's/v//')
+        curl -sSL "https://github.com/gitleaks/gitleaks/releases/download/v${VER}/gitleaks_${VER}_linux_x64.tar.gz" | tar -xz -C /usr/local/bin gitleaks
+      )
+  trufflehog:
+    - |
+      command -v trufflehog >/dev/null || (
+        VER=$(curl -sSL https://api.github.com/repos/trufflesecurity/trufflehog/releases/latest | grep tag_name | cut -d '"' -f4)
+        curl -sSL "https://github.com/trufflesecurity/trufflehog/releases/download/${VER}/trufflehog_${VER#v}_linux_amd64.tar.gz" | tar -xz -C /usr/local/bin trufflehog
+      )
+  nuclei:
+    - |
+      command -v nuclei >/dev/null || (
+        VER=$(curl -sSL https://api.github.com/repos/projectdiscovery/nuclei/releases/latest | grep tag_name | cut -d '"' -f4 | sed 's/v//')
+        curl -sSL "https://github.com/projectdiscovery/nuclei/releases/download/v${VER}/nuclei_${VER}_linux_amd64.zip" -o /tmp/nuclei.zip
+        unzip -qo /tmp/nuclei.zip -d /usr/local/bin nuclei
+      )
+    - nuclei -update-templates 2>>/dev/null || true
+
+# Dedicated parsers — JSON flags match web/src/lib/utils/parsers/structured-output.ts
+semgrep:
+  run:
+    - semgrep --json --config semgrep/rules.yml --quiet semgrep/
+
+bandit:
+  run:
+    - bandit -f json -r bandit/
+
+trufflehog:
+  run:
+    - trufflehog filesystem trufflehog/ --json
+
+nuclei:
+  run:
+    - nuclei -l nuclei/urls.txt -t nuclei/templates/ -jsonl -silent -rate-limit 50
+
+gitleaks:
+  run:
+    - gitleaks dir gitleaks/ --no-banner --report-format json --report-path -
+
+ruff:
+  run:
+    - ruff check --config ruff/ruff.toml --output-format=json ruff/
+
+basedpyright:
+  run:
+    - basedpyright --project basedpyright --outputjson basedpyright/
+
+trivy:
+  run:
+    - trivy fs --scanners vuln,misconfig,secret --format json trivy/
+
+checkov:
+  run:
+    - checkov -d checkov/ -o json --quiet --compact --framework terraform
+
+pyspector:
+  run:
+    # Built-in excludes match `*tests*` / `*fixtures*` in paths, so scan a neutral copy.
+    - |
+      rm -rf /tmp/pyspector-scan
+      mkdir -p /tmp/pyspector-scan
+      cp pyspector/*.py /tmp/pyspector-scan/
+      pyspector scan -f json /tmp/pyspector-scan/
+
+# Fallback shape-agnostic parser (no dedicated tool handler)
+shellcheck:
+  run:
+    - find shellcheck/ -type f -name '*.sh' -print0 | xargs -0 -r shellcheck -f json

@@ -1,0 +1,15 @@
+id: parsers-tests-critical
+info:
+  name: Parsers test — critical severity
+  author: satorici
+  severity: critical
+  description: Always-matching template to exercise the nuclei CRITICAL parser path.
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}"
+    matchers:
+      - type: status
+        status:
+          - 200

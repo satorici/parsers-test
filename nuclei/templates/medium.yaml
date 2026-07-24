@@ -1,0 +1,15 @@
+id: parsers-tests-medium
+info:
+  name: Parsers test — medium severity
+  author: satorici
+  severity: medium
+  description: Always-matching template to exercise the nuclei MEDIUM parser path.
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}"
+    matchers:
+      - type: status
+        status:
+          - 200

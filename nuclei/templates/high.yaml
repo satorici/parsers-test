@@ -1,0 +1,15 @@
+id: parsers-tests-high
+info:
+  name: Parsers test — high severity
+  author: satorici
+  severity: high
+  description: Always-matching template to exercise the nuclei HIGH parser path.
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}"
+    matchers:
+      - type: status
+        status:
+          - 200

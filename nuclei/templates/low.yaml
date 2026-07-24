@@ -1,0 +1,15 @@
+id: parsers-tests-low
+info:
+  name: Parsers test — low severity
+  author: satorici
+  severity: low
+  description: Always-matching template to exercise the nuclei LOW parser path.
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}"
+    matchers:
+      - type: status
+        status:
+          - 200

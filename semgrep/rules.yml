@@ -1,0 +1,31 @@
+rules:
+  - id: parsers-tests.semgrep.error-eval
+    message: "Detected eval() — arbitrary code execution risk."
+    languages: [python]
+    severity: ERROR
+    metadata:
+      impact: HIGH
+      confidence: HIGH
+      cwe: ["CWE-95"]
+      owasp: ["A03:2021"]
+      shortlink: "https://sg.run/eval"
+    pattern: eval(...)
+
+  - id: parsers-tests.semgrep.warning-assert
+    message: "Assert used for input validation — stripped with -O."
+    languages: [python]
+    severity: WARNING
+    metadata:
+      impact: MEDIUM
+      confidence: MEDIUM
+      cwe: ["CWE-617"]
+    pattern: assert $COND, $MSG
+
+  - id: parsers-tests.semgrep.info-print
+    message: "print() left in code — prefer structured logging."
+    languages: [python]
+    severity: INFO
+    metadata:
+      impact: LOW
+      confidence: LOW
+    pattern: print(...)

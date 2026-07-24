@@ -1,0 +1,7 @@
+{
+  "include": ["."],
+  "reportUnusedVariable": "warning",
+  "reportUnusedImport": "information",
+  "reportReturnType": "error",
+  "reportArgumentType": "error"
+}
