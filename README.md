@@ -16,6 +16,8 @@ Install and run steps live in [`.satori.yml`](.satori.yml) (Python image; tools 
 |------|---------|------|
 | semgrep | `semgrep/` | Dedicated parser |
 | bandit | `bandit/` | Dedicated parser |
+| gosec | `gosec/` | Dedicated parser |
+| eslint | `eslint/` | Dedicated parser |
 | trufflehog | `trufflehog/` | Dedicated parser |
 | nuclei | `nuclei/` | Dedicated parser |
 | gitleaks | `gitleaks/` | Dedicated parser |
@@ -26,7 +28,7 @@ Install and run steps live in [`.satori.yml`](.satori.yml) (Python image; tools 
 | pyspector | `pyspector/` | Dedicated parser |
 | shellcheck | `shellcheck/` | Dynamic fallback parser |
 
-JSON/JSONL flags match the frontend parsers in the main Satori app. Exercise them via Satori web UI reports after a run.
+JSON/JSONL flags match the findings-lambda parsers. Exercise them via Satori web UI reports after a run.
 
 ## Disclaimer
 

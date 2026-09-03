@@ -11,7 +11,7 @@ settings:
 
 install:
   system:
-    - export DEBIAN_FRONTEND=noninteractive; apt-get update -qq >/dev/null; apt-get install -qy --no-install-recommends curl unzip git ca-certificates shellcheck >/dev/null
+    - export DEBIAN_FRONTEND=noninteractive; apt-get update -qq >/dev/null; apt-get install -qy --no-install-recommends curl unzip git ca-certificates shellcheck nodejs npm >/dev/null
   pip:
     - pip install -q --disable-pip-version-check --root-user-action=ignore semgrep bandit ruff basedpyright checkov pyspector
   trivy:
@@ -36,8 +36,17 @@ install:
         unzip -qo /tmp/nuclei.zip -d /usr/local/bin nuclei
       )
     - nuclei -update-templates 2>>/dev/null || true
+  gosec:
+    - |
+      command -v gosec >/dev/null || (
+        curl -sL https://api.github.com/repos/securego/gosec/releases/latest |
+          grep browser_download_url | grep 'linux_amd64\.tar\.gz"' | head -1 | cut -d'"' -f4 |
+          xargs curl -sL | tar xz -C /usr/local/bin/
+      )
+  eslint:
+    - npm install -g eslint@8.57.1 --silent --no-fund --no-audit
 
-# Dedicated parsers — JSON flags match web/src/lib/utils/parsers/structured-output.ts
+# Dedicated parsers — JSON flags match findings-lambda parsers
 semgrep:
   run:
     - semgrep --json --config semgrep/rules.yml --quiet semgrep/
@@ -45,6 +54,23 @@ semgrep:
 bandit:
   run:
     - bandit -f json -r bandit/
+
+gosec:
+  run:
+    - gosec -fmt=json ./gosec/...
+
+eslint:
+  run:
+    - |
+      eslint eslint/ -f json --no-eslintrc --env es2021 \
+        --rule 'no-eval:error' \
+        --rule 'no-implied-eval:error' \
+        --rule 'no-console:warn' \
+        --rule 'no-unused-vars:warn' \
+        --rule 'use-isnan:error' \
+        --rule 'no-process-exit:error' \
+        --rule 'semi:warn' \
+        || true
 
 trufflehog:
   run:
