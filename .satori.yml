@@ -11,7 +11,7 @@ settings:
 
 install:
   system:
-    - export DEBIAN_FRONTEND=noninteractive; apt-get update -qq >/dev/null; apt-get install -qy --no-install-recommends curl unzip git ca-certificates shellcheck nodejs npm >/dev/null
+    - export DEBIAN_FRONTEND=noninteractive; apt-get update -qq >/dev/null; apt-get install -qy --no-install-recommends curl unzip xz-utils git ca-certificates shellcheck nodejs npm >/dev/null
   pip:
     - pip install -q --disable-pip-version-check --root-user-action=ignore semgrep bandit ruff basedpyright checkov pyspector
   trivy:
@@ -45,6 +45,12 @@ install:
       )
   eslint:
     - npm install -g eslint@8.57.1 --silent --no-fund --no-audit
+  jsspector:
+    - |
+      command -v jsspector >/dev/null || (
+        VER=$(curl -sSL https://api.github.com/repos/satoridev01/JSSpector/releases/latest | grep tag_name | cut -d '"' -f4 | sed 's/v//')
+        curl -sSL "https://github.com/satoridev01/JSSpector/releases/download/v${VER}/jsspector-x86_64-unknown-linux-gnu.tar.xz" | tar -xJ -C /usr/local/bin --strip-components=1 jsspector-x86_64-unknown-linux-gnu/jsspector
+      )
 
 # Dedicated parsers — JSON flags match findings-lambda parsers
 semgrep:
@@ -108,6 +114,10 @@ pyspector:
       mkdir -p /tmp/pyspector-scan
       cp pyspector/*.py /tmp/pyspector-scan/
       pyspector scan -f json /tmp/pyspector-scan/
+
+jsspector:
+  run:
+    - PATH="/usr/local/bin:$HOME/.cargo/bin:$PATH" jsspector scan --json jsspector/
 
 # Fallback shape-agnostic parser (no dedicated tool handler)
 shellcheck:
