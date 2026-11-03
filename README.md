@@ -26,6 +26,7 @@ Install and run steps live in [`.satori.yml`](.satori.yml) (Python image; tools 
 | trivy | `trivy/` | Dedicated parser |
 | checkov | `checkov/` | Dedicated parser |
 | pyspector | `pyspector/` | Dedicated parser |
+| jsspector | `jsspector/` | Satori JSON fields (dynamic until dedicated) |
 | shellcheck | `shellcheck/` | Dynamic fallback parser |
 
 JSON/JSONL flags match the findings-lambda parsers. Exercise them via Satori web UI reports after a run.
